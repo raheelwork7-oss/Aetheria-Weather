@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aetheria Weather Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="sttyle.css" />
+</head>
+
+<body data-theme="dark" data-weather="clear">
+    <div class="background-overlay"></div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-icon"><i data-lucide="cloud-lightning"></i></div>
+                <h1>Aetheria <span>Weather</span></h1>
+            </div>
+
+            <div class="search-section">
+                <form id="search-form" class="search-form" role="search" aria-label="City search">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="city-input" placeholder="Search city or country..." autocomplete="off"
+                            aria-label="Enter city name" />
+                        <button type="button" id="clear-search" class="clear-btn hidden" aria-label="Clear input">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-primary" aria-label="Search weather">
+                        <span>Search</span>
+                    </button>
+                </form>
+
+                <button id="location-btn" class="btn btn-glass icon-btn" title="Use current location"
+                    aria-label="Use current location">
+                    <i data-lucide="map-pin"></i>
+                </button>
+            </div>
+
+            <div class="header-controls">
+                <div class="unit-toggle-group" role="radiogroup" aria-label="Temperature Unit">
+                    <button type="button" id="unit-c" class="unit-btn active" role="radio"
+                        aria-checked="true">Â°C</button>
+                    <button type="button" id="unit-f" class="unit-btn" role="radio" aria-checked="false">Â°F</button>
+                </div>
+
+                <button id="refresh-btn" class="btn btn-glass icon-btn" title="Refresh Weather"
+                    aria-label="Refresh data">
+                    <i data-lucide="rotate-cw"></i>
+                </button>
+
+                <button id="theme-btn" class="btn btn-glass icon-btn" title="Toggle Light/Dark Theme"
+                    aria-label="Toggle theme">
+                    <i data-lucide="moon" id="theme-icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <section class="recent-searches-container" id="recent-searches-section">
+            <span class="label"><i data-lucide="history"></i> Recent:</span>
+            <div id="recent-searches" class="tags-wrapper">
+            </div>
+        </section>
+
+
+
+        <div id="loading-state" class="state-container hidden">
+            <div class="spinner"></div>
+            <p>Fetching atmospheric data...</p>
+        </div>
+
+        <div id="error-state" class="state-container hidden">
+            <div class="error-icon"><i data-lucide="cloud-off"></i></div>
+            <h3 id="error-title">City Not Found</h3>
+            <p id="error-message">We couldn't retrieve weather data for that location. Please check spelling or try
+                another city.</p>
+            <button id="error-retry-btn" class="btn btn-primary">Try Again</button>
+        </div>
+
+        <main id="weather-content" class="weather-grid">
+            <section class="card main-weather-card">
+                <div class="main-card-header">
+                    <div>
+                        <h2 id="location-name">--</h2>
+                        <p id="location-time" class="time-stamp">--</p>
+                    </div>
+                    <div id="weather-badge" class="badge">--</div>
+                </div>
+
+                <div class="main-card-body">
+                    <div class="temp-display">
+                        <span id="current-temp" class="temp-value">--</span>
+                        <span class="temp-unit">Â°</span>
+                    </div>
+                    <div class="weather-visual">
+                        <div id="main-weather-icon" class="main-icon">
+                            <i data-lucide="sun"></i>
+                        </div>
+                        <p id="weather-desc" class="condition-desc">--</p>
+                    </div>
+                </div>
+
+                <div class="main-card-footer">
+                    <div class="stat-pill">
+                        <i data-lucide="thermometer"></i>
+                        <span>Feels like <strong id="feels-like">--</strong></span>
+                    </div>
+                    <div class="stat-pill">
+                        <i data-lucide="arrow-up-down"></i>
+                        <span>H: <strong id="temp-high">--</strong> L: <strong id="temp-low">--</strong></span>
+                    </div>
+                    <div class="stat-pill">
+                        <i data-lucide="umbrella"></i>
+                        <span>Rain: <strong id="precip-chance">--</strong></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="highlights-grid">
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Humidity</span>
+                        <i data-lucide="droplets"></i>
+                    </div>
+                    <div class="stat-body">
+                        <span id="humidity-val" class="stat-value">--</span>
+                        <span class="stat-unit">%</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span id="humidity-status">--</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Wind Speed</span>
+                        <i data-lucide="wind"></i>
+                    </div>
+                    <div class="stat-body">
+                        <span id="wind-val" class="stat-value">--</span>
+                        <span id="wind-unit-label" class="stat-unit">km/h</span>
+                    </div>
+                    <div class="stat-footer">
+                        <i data-lucide="compass" id="wind-dir-icon" class="inline-icon"></i>
+                        <span id="wind-dir-text">--</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>UV Index</span>
+                        <i data-lucide="sun-medium"></i>
+                    </div>
+                    <div class="stat-body">
+                        <span id="uv-val" class="stat-value">--</span>
+                        <span class="stat-unit">/10</span>
+                    </div>
+                    <div class="stat-footer">
+                        <div class="uv-bar-bg">
+                            <div id="uv-bar" class="uv-bar-fill"></div>
+                        </div>
+                        <span id="uv-status">--</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Visibility</span>
+                        <i data-lucide="eye"></i>
+                    </div>
+                    <div class="stat-body">
+                        <span id="vis-val" class="stat-value">--</span>
+                        <span class="stat-unit">km</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span id="vis-status">--</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card">
+                    <div class="stat-header">
+                        <span>Pressure</span>
+                        <i data-lucide="gauge"></i>
+                    </div>
+                    <div class="stat-body">
+                        <span id="pressure-val" class="stat-value">--</span>
+                        <span class="stat-unit">hPa</span>
+                    </div>
+                    <div class="stat-footer">
+                        <span id="pressure-status">--</span>
+                    </div>
+                </div>
+
+                <div class="card stat-card sun-card">
+                    <div class="stat-header">
+                        <span>Sun Schedule</span>
+                        <i data-lucide="sunrise"></i>
+                    </div>
+                    <div class="sun-arc-wrapper">
+                        <svg viewBox="0 0 100 50" class="sun-arc-svg">
+                            <path d="M 10 45 A 40 40 0 0 1 90 45" fill="none" stroke="rgba(255,255,255,0.15)"
+                                stroke-width="3" stroke-dasharray="2,2" />
+                            <path id="sun-arc-progress" d="M 10 45 A 40 40 0 0 1 90 45" fill="none"
+                                stroke="var(--accent-glow)" stroke-width="4" stroke-dasharray="126"
+                                stroke-dashoffset="126" />
+                            <circle id="sun-position-dot" cx="10" cy="45" r="4" fill="#fbbf24" stroke="#ffffff"
+                                stroke-width="1.5" />
+                        </svg>
+                    </div>
+                    <div class="sun-times">
+                        <div>
+                            <span class="sub-text">Sunrise</span>
+                            <p id="sunrise-time">--</p>
+                        </div>
+                        <div>
+                            <span class="sub-text">Sunset</span>
+                            <p id="sunset-time">--</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card section-card hourly-section">
+                <h3><i data-lucide="clock"></i> Hourly Forecast</h3>
+                <div id="hourly-container" class="horizontal-scroll">
+                </div>
+            </section>
+
+            <section class="card section-card daily-section">
+                <h3><i data-lucide="calendar"></i> 7-Day Forecast</h3>
+                <div id="daily-container" class="daily-list">
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
